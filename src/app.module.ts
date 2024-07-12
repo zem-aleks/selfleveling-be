@@ -8,6 +8,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { memoryStorage } from 'multer';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { memoryStorage } from 'multer';
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
