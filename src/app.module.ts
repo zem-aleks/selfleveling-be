@@ -9,6 +9,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { memoryStorage } from 'multer';
 import { AuthModule } from './modules/auth/auth.module';
+import { User } from './modules/users/entities/user.entity';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -23,7 +25,7 @@ import { AuthModule } from './modules/auth/auth.module';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [],
+          entities: [User],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],
@@ -45,6 +47,7 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     ScheduleModule.forRoot(),
     AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
