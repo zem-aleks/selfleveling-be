@@ -1,18 +1,16 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UserPipe } from '../users/pipes/user.pipe';
 import { User } from '../users/entities/user.entity';
 import { ChatsService } from './chats.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { CustomRequest } from '../../shared/decorators/custom-request.decorator';
 import { mapToEntity } from './mappers/mapToEntity';
 import { ChatEntity } from './types/entity';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('chats')
+@UseGuards(JwtAuthGuard)
 export class ChatsController {
-  constructor(
-    private readonly chatsService: ChatsService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  constructor(private readonly chatsService: ChatsService) {}
 
   @Get()
   async get(

@@ -2,15 +2,12 @@ import {
   Injectable,
   PipeTransform,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { UsersService } from '../users.service';
 import { AuthRequest } from '../../auth/types';
-import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 
 @Injectable()
-@UseGuards(JwtAuthGuard)
 export class UserPipe implements PipeTransform<AuthRequest, Promise<User>> {
   constructor(private readonly usersService: UsersService) {}
 
