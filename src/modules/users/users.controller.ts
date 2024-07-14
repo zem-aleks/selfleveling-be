@@ -6,9 +6,9 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { mapToEntity } from './mappers/mapToEntity';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   findMe(
     @CustomRequest(UserPipe)
     user: User,

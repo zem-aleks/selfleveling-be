@@ -11,6 +11,8 @@ import { memoryStorage } from 'multer';
 import { AuthModule } from './modules/auth/auth.module';
 import { User } from './modules/users/entities/user.entity';
 import { UsersModule } from './modules/users/users.module';
+import { Chat } from './modules/chats/entities/chat.entity';
+import { ChatsModule } from './modules/chats/chats.module';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { UsersModule } from './modules/users/users.module';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [User],
+          entities: [User, Chat],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],
@@ -48,6 +50,7 @@ import { UsersModule } from './modules/users/users.module';
     ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
