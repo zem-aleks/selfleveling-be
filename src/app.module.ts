@@ -13,6 +13,7 @@ import { User } from './modules/users/entities/user.entity';
 import { UsersModule } from './modules/users/users.module';
 import { Chat } from './modules/chats/entities/chat.entity';
 import { ChatsModule } from './modules/chats/chats.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { ChatsModule } from './modules/chats/chats.module';
     AuthModule,
     UsersModule,
     ChatsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
