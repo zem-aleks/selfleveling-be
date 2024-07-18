@@ -6,12 +6,10 @@ import { AIMessage } from '@langchain/core/dist/messages/ai';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { Observable } from 'rxjs';
 import { StreamResponse } from '../types/stream';
-
-const MODELS = [
-  { name: 'gpt-4o', contextWindow: 128000 },
-  { name: 'gpt-4', contextWindow: 8192 },
-  { name: 'gpt-4-turbo', contextWindow: 128000 },
-  { name: 'gpt-3.5-turbo', contextWindow: 16385 },
+export const MODELS = [
+  { name: 'gpt-4o', contextWindow: 128000, title: 'GPT-4o' },
+  { name: 'gpt-4-turbo', contextWindow: 128000, title: 'GPT-4-Turbo' },
+  { name: 'gpt-3.5-turbo', contextWindow: 16385, title: 'GPT-3.5-Turbo' },
 ] as const;
 
 export type ModelType = (typeof MODELS)[number]['name'];

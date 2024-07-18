@@ -1,3 +1,5 @@
+import { ThreadEntityWithMessages } from '../../threads/types/entity';
+
 export type ChatEntity = {
   id: string;
   userId: string;
@@ -6,4 +8,8 @@ export type ChatEntity = {
   logo: string | null;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type ChatEntityWithThreads = ChatEntity & {
+  threads: ThreadEntityWithMessages[];
 };

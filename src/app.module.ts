@@ -14,6 +14,10 @@ import { UsersModule } from './modules/users/users.module';
 import { Chat } from './modules/chats/entities/chat.entity';
 import { ChatsModule } from './modules/chats/chats.module';
 import { AiModule } from './modules/ai/ai.module';
+import { ThreadsModule } from './modules/threads/threads.module';
+import { Thread } from './modules/threads/entities/thread.entity';
+import { Message } from './modules/messages/entities/message.entity';
+import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
@@ -28,7 +32,7 @@ import { AiModule } from './modules/ai/ai.module';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [User, Chat],
+          entities: [User, Chat, Thread, Message],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],
@@ -53,6 +57,8 @@ import { AiModule } from './modules/ai/ai.module';
     UsersModule,
     ChatsModule,
     AiModule,
+    ThreadsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
