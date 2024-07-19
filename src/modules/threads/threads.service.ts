@@ -23,6 +23,13 @@ export class ThreadsService {
     return this.repository.findOne({ where: { id } });
   }
 
+  getByChatId(chatId: string) {
+    return this.repository.find({
+      where: { chatId },
+      order: { createdAt: 'ASC' },
+    });
+  }
+
   getChatsByUserId(userId: string, skip?: number, take?: number) {
     return this.repository.find({
       where: { userId },

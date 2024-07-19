@@ -1,20 +1,19 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserPipe } from '../users/pipes/user.pipe';
 import { User } from '../users/entities/user.entity';
 import { ChatsService } from './chats.service';
 import { CustomRequest } from '../../shared/decorators/custom-request.decorator';
 import { mapChatToEntity as mapChatToEntity } from './mappers/mapChatToEntity';
-import { ChatEntity } from './types/entity';
+import { ChatEntity, ChatEntityWithThreads } from './types/entity';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { OpenaiService } from '../ai/services/openai.service';
 import { ThreadsService } from '../threads/threads.service';
 import { TokensService } from '../ai/services/tokens.service';
-import { mapToThreadWithMessages } from '../threads/mappers/mapToEntity';
 import { CreateChatRequestDto, CreateChatResponseDto } from './types/dto';
 import { MessagesService } from '../messages/messages.service';
 import { ThreadCreateData } from '../threads/types/data';
 import { MessageCreateData } from '../messages/types/data';
-import { ThreadEntityWithMessages } from '../threads/types/entity';
+import { mapToChatEntityWithThreads } from './mappers/mapToChatEntityWithThreads';
 
 @Controller('chats')
 @UseGuards(JwtAuthGuard)
@@ -34,6 +33,19 @@ export class ChatsController {
   ): Promise<ChatEntity[]> {
     const chats = await this.chatsService.getChatsByUserId(user.id);
     return chats.map(mapChatToEntity);
+  }
+
+  @Get(':id')
+  async getChat(
+    @CustomRequest(UserPipe)
+    user: User,
+    @Param('id') id: string,
+  ): Promise<ChatEntityWithThreads> {
+    const chat = await this.chatsService.getById(id);
+    const threads = await this.threadsService.getByChatId(chat.id);
+    const messages = await this.messagesService.getByChatId(chat.id);
+
+    return mapToChatEntityWithThreads(chat, threads, messages);
   }
 
   @Post()
@@ -97,19 +109,8 @@ export class ChatsController {
 
     const messagesCreateData: MessageCreateData[] = data.flat();
     const messages = await this.messagesService.createMany(messagesCreateData);
-    const threadsWithMessages: ThreadEntityWithMessages[] = threads.map(
-      (thread) => {
-        const threadMessages = messages.filter(
-          (message) => message.threadId === thread.id,
-        );
-        return mapToThreadWithMessages(thread, threadMessages);
-      },
-    );
 
-    return {
-      ...mapChatToEntity(chat),
-      threads: threadsWithMessages,
-    };
+    return mapToChatEntityWithThreads(chat, threads, messages);
 
     // const data = await this.openaiService.completeChatStream({
     //   modelType: modelType,
