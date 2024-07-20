@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { UserPipe } from '../users/pipes/user.pipe';
 import { User } from '../users/entities/user.entity';
 import { ChatsService } from './chats.service';
@@ -42,6 +50,10 @@ export class ChatsController {
     @Param('id') id: string,
   ): Promise<ChatEntityWithThreads> {
     const chat = await this.chatsService.getById(id);
+    if (chat.userId !== user.id) {
+      throw new NotFoundException(`Chat  not found`);
+    }
+
     const threads = await this.threadsService.getByChatId(chat.id);
     const messages = await this.messagesService.getByChatId(chat.id);
 
@@ -111,16 +123,5 @@ export class ChatsController {
     const messages = await this.messagesService.createMany(messagesCreateData);
 
     return mapToChatEntityWithThreads(chat, threads, messages);
-
-    // const data = await this.openaiService.completeChatStream({
-    //   modelType: modelType,
-    //   temperature: temperature,
-    //   messages: [
-    //     new SystemMessage({ content: systemPrompt }),
-    //     new HumanMessage({ content: message }),
-    //   ],
-    // });
-    //
-    // return observableToStream(data);
   }
 }

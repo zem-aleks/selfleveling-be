@@ -19,13 +19,30 @@ export class MessagesService {
     return this.repository.save(data);
   }
 
+  async update(message: Message): Promise<Message> {
+    return this.repository.save(message);
+  }
+
   getById(id: number) {
     return this.repository.findOne({ where: { id } });
   }
 
-  getByChatId(chatId: string) {
-    return this.repository.find({
+  async getByChatId(chatId: string) {
+    const messages = await this.repository.find({
       where: { chatId },
+      order: { createdAt: 'ASC' },
+    });
+    return messages.sort((a, b) => {
+      if (a.role === 'system' && b.role !== 'system') {
+        return -1;
+      }
+      return 1;
+    });
+  }
+
+  getByThreadId(threadId: string) {
+    return this.repository.find({
+      where: { threadId },
       order: { createdAt: 'ASC' },
     });
   }

@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
 import { ChatCompletionChunk } from 'openai/resources';
-import { StreamResponse } from '../types/stream';
+import { ChatChunkStreamResponse } from '../types/stream';
 
 export const convertStreamIntoObservable = (
   stream: ReadableStream<any>,
-): Observable<StreamResponse> => {
+): Observable<ChatChunkStreamResponse> => {
   const reader = stream.getReader();
   const decoder = new TextDecoder('utf-8');
   return new Observable((observer) => {

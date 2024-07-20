@@ -10,7 +10,7 @@ async function bootstrap() {
   // TODO: I have concerns about preflight requests with OPTIONS. For some reason these requests go inside the app :(
   app.enableCors({
     origin: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     preflightContinue: false,
     optionsSuccessStatus: 204,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Thread } from './entities/thread.entity';
 import { ThreadCreateData } from './types/data';
 
@@ -21,6 +21,10 @@ export class ThreadsService {
 
   getById(id: string) {
     return this.repository.findOne({ where: { id } });
+  }
+
+  getByIds(ids: string[]) {
+    return this.repository.find({ where: { id: In(ids) } });
   }
 
   getByChatId(chatId: string) {
