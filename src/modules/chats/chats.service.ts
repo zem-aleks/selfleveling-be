@@ -17,6 +17,10 @@ export class ChatsService {
     return this.chatsRepository.save(data);
   }
 
+  async save(chat: Chat): Promise<Chat> {
+    return this.chatsRepository.save(chat);
+  }
+
   getById(id: string) {
     return this.chatsRepository.findOne({ where: { id } });
   }

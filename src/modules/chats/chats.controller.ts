@@ -22,6 +22,9 @@ import { MessagesService } from '../messages/messages.service';
 import { ThreadCreateData } from '../threads/types/data';
 import { MessageCreateData } from '../messages/types/data';
 import { mapToChatEntityWithThreads } from './mappers/mapToChatEntityWithThreads';
+import { Chat } from './entities/chat.entity';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import { noOperation } from '../../shared/utils/notReachable';
 
 @Controller('chats')
 @UseGuards(JwtAuthGuard)
@@ -122,6 +125,38 @@ export class ChatsController {
     const messagesCreateData: MessageCreateData[] = data.flat();
     const messages = await this.messagesService.createMany(messagesCreateData);
 
+    // non-blocking generation
+    this.generateChatTitle({
+      chat,
+      userMessage: message,
+    }).then(noOperation);
+
     return mapToChatEntityWithThreads(chat, threads, messages);
+  }
+
+  async generateChatTitle({
+    chat,
+    userMessage,
+  }: {
+    chat: Chat;
+    userMessage: string;
+  }) {
+    const title = await this.openaiService.completeChat({
+      modelType: 'gpt-4o',
+      messages: [
+        new SystemMessage({
+          content: `Your goal is to generate a short title of chat based on user's message. Don't add any comments. Output must contain only title. Preferable not more than 5 words.`,
+        }),
+        new HumanMessage({
+          content: userMessage,
+        }),
+      ],
+      temperature: 0.5,
+    });
+
+    return this.chatsService.save({
+      ...chat,
+      title,
+    });
   }
 }
