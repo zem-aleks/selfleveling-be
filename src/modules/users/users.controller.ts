@@ -1,18 +1,16 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { UserPipe } from './pipes/user.pipe';
-import { User } from './entities/user.entity';
-import { CustomRequest } from '../../shared/decorators/custom-request.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { mapToEntity } from './mappers/mapToEntity';
+import { AuthUser } from '../../shared/decorators/auth.decorator';
+import { User } from '@supabase/supabase-js';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   @Get('me')
   findMe(
-    @CustomRequest(UserPipe)
+    @AuthUser()
     user: User,
   ) {
-    return mapToEntity(user);
+    return { id: user.id, email: user.email };
   }
 }

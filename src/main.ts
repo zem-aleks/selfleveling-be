@@ -16,6 +16,6 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  await app.listen(8001);
+  await app.listen(8000);
 }
 bootstrap();

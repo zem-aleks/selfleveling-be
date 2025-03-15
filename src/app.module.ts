@@ -9,15 +9,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { memoryStorage } from 'multer';
 import { AuthModule } from './modules/auth/auth.module';
-import { User } from './modules/users/entities/user.entity';
 import { UsersModule } from './modules/users/users.module';
-import { Chat } from './modules/chats/entities/chat.entity';
-import { ChatsModule } from './modules/chats/chats.module';
-import { AiModule } from './modules/ai/ai.module';
-import { ThreadsModule } from './modules/threads/threads.module';
-import { Thread } from './modules/threads/entities/thread.entity';
-import { Message } from './modules/messages/entities/message.entity';
-import { MessagesModule } from './modules/messages/messages.module';
+import { SupabaseModule } from './modules/supabase/supabase.module';
 
 @Module({
   imports: [
@@ -32,7 +25,7 @@ import { MessagesModule } from './modules/messages/messages.module';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [User, Chat, Thread, Message],
+          entities: [],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],
@@ -53,12 +46,13 @@ import { MessagesModule } from './modules/messages/messages.module';
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
+    SupabaseModule,
     AuthModule,
     UsersModule,
-    ChatsModule,
-    AiModule,
-    ThreadsModule,
-    MessagesModule,
+    // ChatsModule,
+    // AiModule,
+    // ThreadsModule,
+    // MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
