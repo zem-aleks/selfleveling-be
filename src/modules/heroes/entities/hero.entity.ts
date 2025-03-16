@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Chat {
+export class Hero {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -15,17 +15,14 @@ export class Chat {
   userId: string;
 
   @Column({ nullable: false })
-  title: string;
+  name: string;
 
-  @Column({ nullable: true, type: 'varchar' })
-  subtitle: string | null;
+  @Column({ nullable: false })
+  language: string;
 
-  @Column({ nullable: true, type: 'varchar' })
-  logo: string | null;
-
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 }

@@ -9,8 +9,9 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { memoryStorage } from 'multer';
 import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
 import { SupabaseModule } from './modules/supabase/supabase.module';
+import { HeroesModule } from './modules/heroes/heroes.module';
+import { Hero } from './modules/heroes/entities/hero.entity';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { SupabaseModule } from './modules/supabase/supabase.module';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [],
+          entities: [Hero],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],
@@ -48,11 +49,7 @@ import { SupabaseModule } from './modules/supabase/supabase.module';
     ScheduleModule.forRoot(),
     SupabaseModule,
     AuthModule,
-    UsersModule,
-    // ChatsModule,
-    // AiModule,
-    // ThreadsModule,
-    // MessagesModule,
+    HeroesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

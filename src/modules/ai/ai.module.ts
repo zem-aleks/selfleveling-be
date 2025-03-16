@@ -1,11 +1,10 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { OpenaiService } from './services/openai.service';
 import { HttpModule } from '@nestjs/axios';
 import { TokensService } from './services/tokens.service';
-import { ChatsModule } from '../chats/chats.module';
 
 @Module({
-  imports: [HttpModule, forwardRef(() => ChatsModule)],
+  imports: [HttpModule],
   providers: [OpenaiService, TokensService],
   exports: [OpenaiService, TokensService],
 })
