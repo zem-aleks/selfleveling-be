@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GoalDraft } from './types/entity';
 import { Goal } from './entities/goal.entity';
+import { Hero } from '../heroes/entities/hero.entity';
 
 @Injectable()
 export class GoalsService {
@@ -12,9 +13,21 @@ export class GoalsService {
   ) {}
 
   async createDraft(
-    data: Omit<GoalDraft, 'id' | 'createdAt' | 'updatedAt' | 'threadId'>,
+    data: Omit<
+      GoalDraft,
+      | 'id'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'threadId'
+      | 'score'
+      | 'followUpQuestion'
+    >,
   ): Promise<Goal> {
     return this.repository.save(data);
+  }
+
+  async save(goal: Goal): Promise<Goal> {
+    return this.repository.save(goal);
   }
 
   getById(id: string) {

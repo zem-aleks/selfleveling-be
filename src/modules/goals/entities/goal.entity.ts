@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export type GoalStatus = 'draft';
+export type GoalStatus = 'draft' | 'formed';
 
 @Entity()
 export class Goal {
@@ -26,6 +26,18 @@ export class Goal {
 
   @Column({ nullable: false })
   goal: string;
+
+  @Column({ nullable: false, default: 0 })
+  score: number;
+
+  @Column({ nullable: true, type: 'varchar' })
+  followUpQuestion: string | null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  title: string | null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  description: string | null;
 
   @Column({ nullable: false, type: 'varchar' })
   status: GoalStatus;

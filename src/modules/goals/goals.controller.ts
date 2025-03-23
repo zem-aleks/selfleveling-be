@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
@@ -19,6 +20,7 @@ import { GoalByIdPipe } from './pipes/goal-by-id.pipe';
 import { Goal } from './entities/goal.entity';
 import { HeroesService } from '../heroes/heroes.service';
 import { mapHeroToEntity } from '../heroes/mappers/mapHeroToEntity';
+import { notReachable } from '../../shared/utils/notReachable';
 
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
@@ -33,28 +35,56 @@ export class GoalsController {
   async create(
     @AuthUser() user: User,
     @Body('heroId', HeroByIdPipe) hero: Hero,
-    @Body() { goal }: { goal: string },
+    @Body() body: { goal: string },
   ) {
     if (hero.userId !== user.id) {
       throw new NotFoundException(`Hero not found`);
     }
 
-    const goalEntity = await this.goalsService.createDraft({
+    const goal = await this.goalsService.createDraft({
       heroId: hero.id,
-      goal,
+      goal: body.goal,
       userId: user.id,
       status: 'draft',
     });
 
-    // TODO: no awaiting, since we make it in parallel
-    const goalResult = this.langgraphService.extractGoal(
-      goalEntity.threadId,
-      goal,
-    );
+    try {
+      const goalResult = await this.langgraphService.extractGoal(
+        goal.threadId,
+        body.goal,
+      );
 
-    console.log('goalResult', goalResult);
+      switch (goalResult.type) {
+        case 'followUp':
+          await this.goalsService.save({
+            ...goal,
+            score: goalResult.score,
+            followUpQuestion: goalResult.followUpQuestion,
+          });
+          break;
 
-    return { goal: mapGoalToEntity(goalEntity) };
+        case 'success':
+          await this.goalsService.save({
+            ...goal,
+            score: goalResult.score,
+            title: goalResult.title,
+            description: goalResult.description,
+          });
+          break;
+
+        default:
+          return notReachable(goalResult);
+      }
+    } catch (e) {
+      console.error(e);
+      await this.goalsService.save({
+        ...goal,
+        followUpQuestion:
+          'Your goal is not clear. Could you please rephrase it?',
+      });
+    }
+
+    return { goal: mapGoalToEntity(goal) };
   }
 
   @Get(':id')
@@ -73,5 +103,64 @@ export class GoalsController {
     }
 
     return { goal: mapGoalToEntity(goal), hero: mapHeroToEntity(hero) };
+  }
+
+  @Put(':id')
+  async addGoalDetails(
+    @AuthUser() user: User,
+    @Param('id', GoalByIdPipe) goal: Goal,
+    @Body() body: { goal: string },
+  ) {
+    if (goal.userId !== user.id) {
+      throw new NotFoundException(`Goal not found`);
+    }
+
+    const hero = await this.heroesService.getById(goal.heroId);
+    if (!hero) {
+      throw new NotFoundException(`Hero not found`);
+    }
+
+    if (hero.userId !== user.id) {
+      throw new NotFoundException(`Hero not found`);
+    }
+
+    try {
+      const goalResult = await this.langgraphService.extractGoal(
+        goal.threadId,
+        body.goal,
+      );
+
+      switch (goalResult.type) {
+        case 'followUp':
+          await this.goalsService.save({
+            ...goal,
+            score: goalResult.score,
+            followUpQuestion: goalResult.followUpQuestion,
+          });
+          break;
+
+        case 'success':
+          await this.goalsService.save({
+            ...goal,
+            score: goalResult.score,
+            title: goalResult.title,
+            description: goalResult.description,
+            status: 'formed',
+          });
+          break;
+
+        default:
+          return notReachable(goalResult);
+      }
+    } catch (e) {
+      console.error(e);
+      await this.goalsService.save({
+        ...goal,
+        followUpQuestion:
+          'Your goal is not clear. Could you please rephrase it?',
+      });
+    }
+
+    return { goal: mapGoalToEntity(goal) };
   }
 }
