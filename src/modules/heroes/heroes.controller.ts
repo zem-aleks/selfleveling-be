@@ -13,6 +13,8 @@ import { HeroEntity } from './types/entity';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { AuthUser } from '../../shared/decorators/auth.decorator';
 import { User } from '@supabase/supabase-js';
+import { HeroByIdPipe } from './pipes/hero-by-id.pipe';
+import { Hero } from './entities/hero.entity';
 
 @Controller('heroes')
 @UseGuards(JwtAuthGuard)
@@ -28,9 +30,8 @@ export class HeroesController {
   @Get(':id')
   async getHero(
     @AuthUser() user: User,
-    @Param('id') id: string,
+    @Param('id', HeroByIdPipe) hero: Hero,
   ): Promise<HeroEntity> {
-    const hero = await this.heroesService.getById(id);
     if (hero.userId !== user.id) {
       throw new NotFoundException(`Hero not found`);
     }

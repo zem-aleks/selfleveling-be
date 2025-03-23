@@ -12,6 +12,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SupabaseModule } from './modules/supabase/supabase.module';
 import { HeroesModule } from './modules/heroes/heroes.module';
 import { Hero } from './modules/heroes/entities/hero.entity';
+import { GoalsModule } from './modules/goals/goals.module';
+import { LanggraphModule } from './modules/langgraph/langgraph.module';
+import { Goal } from './modules/goals/entities/goal.entity';
 
 @Module({
   imports: [
@@ -26,7 +29,7 @@ import { Hero } from './modules/heroes/entities/hero.entity';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [Hero],
+          entities: [Hero, Goal],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],
@@ -49,7 +52,9 @@ import { Hero } from './modules/heroes/entities/hero.entity';
     ScheduleModule.forRoot(),
     SupabaseModule,
     AuthModule,
+    LanggraphModule,
     HeroesModule,
+    GoalsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
