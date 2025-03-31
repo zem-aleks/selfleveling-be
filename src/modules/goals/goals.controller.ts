@@ -13,7 +13,6 @@ import { AuthUser } from '../../shared/decorators/auth.decorator';
 import { User } from '@supabase/supabase-js';
 import { HeroByIdPipe } from '../heroes/pipes/hero-by-id.pipe';
 import { Hero } from '../heroes/entities/hero.entity';
-import { LanggraphService } from '../langgraph/langgraph.service';
 import { GoalsService } from './goals.service';
 import { mapGoalToEntity } from './mappers/mapGoalToEntity';
 import { GoalByIdPipe } from './pipes/goal-by-id.pipe';
@@ -21,12 +20,13 @@ import { Goal } from './entities/goal.entity';
 import { HeroesService } from '../heroes/heroes.service';
 import { mapHeroToEntity } from '../heroes/mappers/mapHeroToEntity';
 import { notReachable } from '../../shared/utils/notReachable';
+import { GoalExtractService } from '../langgraph/services/goal-extract.service';
 
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
 export class GoalsController {
   constructor(
-    private readonly langgraphService: LanggraphService,
+    private readonly goalExtractService: GoalExtractService,
     private readonly goalsService: GoalsService,
     private readonly heroesService: HeroesService,
   ) {}
@@ -49,7 +49,7 @@ export class GoalsController {
     });
 
     try {
-      const goalResult = await this.langgraphService.extractGoal(
+      const goalResult = await this.goalExtractService.extractGoal(
         goal.threadId,
         body.goal,
       );
@@ -125,7 +125,7 @@ export class GoalsController {
     }
 
     try {
-      const goalResult = await this.langgraphService.extractGoal(
+      const goalResult = await this.goalExtractService.extractGoal(
         goal.threadId,
         body.goal,
       );

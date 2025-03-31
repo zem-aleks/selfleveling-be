@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { LanggraphService } from './langgraph.service';
+import { LanggraphService } from './services/langgraph.service';
+import { GoalExtractService } from './services/goal-extract.service';
+import { KpiBuildingService } from './services/kpi-building.service';
 
 @Module({
   imports: [],
-  providers: [LanggraphService],
-  exports: [LanggraphService],
+  providers: [LanggraphService, GoalExtractService, KpiBuildingService],
+  exports: [GoalExtractService, KpiBuildingService],
 })
 export class LanggraphModule {}

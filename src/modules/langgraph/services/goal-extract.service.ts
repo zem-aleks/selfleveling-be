@@ -1,67 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Client } from '@langchain/langgraph-sdk';
 import { HumanMessage } from '@langchain/core/messages';
 import {
   ExtractGoalResult,
   GoalExtractionEvent,
-} from '../goals/types/extraction';
-import { notReachable } from '../../shared/utils/notReachable';
+} from '../types/goalExtraction';
+import { notReachable } from '../../../shared/utils/notReachable';
+import { LanggraphService } from './langgraph.service';
 
 @Injectable()
-export class LanggraphService {
-  private readonly graphId: string;
-  private readonly client: Client;
+export class GoalExtractService {
+  private readonly graphId = 'goalExtraction';
 
-  constructor(private readonly configService: ConfigService) {
-    const apiUrl = this.configService.get('LANGGRAPH_API_URL') as
-      | string
-      | undefined;
-
-    const graphId = this.configService.get('LANGGRAPH_GRAPH_ID') as
-      | string
-      | undefined;
-
-    if (!apiUrl || !graphId) {
-      throw new Error('LANGGRAPH_API_URL is not defined');
-    }
-
-    this.graphId = graphId;
-    this.client = new Client({ apiUrl });
-  }
-
-  async getThread(threadId: string) {
-    const existingThread = await this.client.threads.get(threadId);
-    if (existingThread) {
-      return existingThread;
-    }
-
-    return this.client.threads.create({
-      threadId,
-      graphId: this.graphId,
-    });
-  }
+  constructor(private readonly langraphService: LanggraphService) {}
 
   async extractGoal(
     threadId: string,
     goal: string,
   ): Promise<ExtractGoalResult> {
-    const thread = await this.getThread(threadId);
-    const streamResponse = this.client.runs.stream(
-      thread.thread_id,
-      this.graphId,
-      {
-        streamMode: 'updates',
-        // TODO: should I add previous messages?
-        input: { messages: [new HumanMessage(goal)] },
-      },
-    );
-
     let result: ExtractGoalResult = {
       type: 'followUp',
       score: 0,
       followUpQuestion: '',
     };
+
+    const thread = await this.langraphService.getOrCreateThread(
+      threadId,
+      this.graphId,
+    );
+
+    const streamResponse = await this.langraphService.runStream({
+      threadId: thread.thread_id,
+      graphId: this.graphId,
+      input: { messages: [new HumanMessage(goal)] },
+    });
 
     for await (const event of streamResponse) {
       switch (event.event) {

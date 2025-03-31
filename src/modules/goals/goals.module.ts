@@ -10,6 +10,6 @@ import { LanggraphModule } from '../langgraph/langgraph.module';
   imports: [TypeOrmModule.forFeature([Goal]), HeroesModule, LanggraphModule],
   controllers: [GoalsController],
   providers: [GoalsService],
-  exports: [],
+  exports: [GoalsService],
 })
 export class GoalsModule {}
