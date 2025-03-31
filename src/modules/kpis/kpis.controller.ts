@@ -4,6 +4,8 @@ import {
   Controller,
   Get,
   NotFoundException,
+  Param,
+  Patch,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -11,12 +13,18 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { AuthUser } from '../../shared/decorators/auth.decorator';
 import { User } from '@supabase/supabase-js';
 import { KpisService } from './kpis.service';
-import { mapKpiToEntity } from './mappers/mapKpiToEntity';
+import {
+  mapKpiToEntity,
+  mapKpiToEntityWithMeasurements,
+} from './mappers/mapKpiToEntity';
 import { Goal } from '../goals/entities/goal.entity';
 import { GoalByIdPipe } from '../goals/pipes/goal-by-id.pipe';
 import { KpiBuildingService } from '../langgraph/services/kpi-building.service';
 import { uuid } from '@supabase/supabase-js/dist/main/lib/helpers';
 import { GoalFormed } from '../goals/types/entity';
+import { GoalsService } from '../goals/goals.service';
+import { SaveKpiData, SaveKpiFormSchema } from './types/data';
+import { MeasurementService } from './measurement.service';
 
 @Controller('kpis')
 @UseGuards(JwtAuthGuard)
@@ -24,63 +32,45 @@ export class KpisController {
   constructor(
     private readonly kpiBuildingService: KpiBuildingService,
     private readonly kpisService: KpisService,
+    private readonly goalsService: GoalsService,
+    private readonly measurementService: MeasurementService,
   ) {}
 
-  // @Post()
-  // async create(
-  //   @AuthUser() user: User,
-  //   @Body('goalId', HeroByIdPipe) hero: Hero,
-  //   @Body() body: { goal: string },
-  // ) {
-  //   if (hero.userId !== user.id) {
-  //     throw new NotFoundException(`Hero not found`);
-  //   }
-  //
-  //   const goal = await this.goalsService.createDraft({
-  //     heroId: hero.id,
-  //     goal: body.goal,
-  //     userId: user.id,
-  //     status: 'draft',
-  //   });
-  //
-  //   try {
-  //     const goalResult = await this.langgraphService.extractGoal(
-  //       goal.threadId,
-  //       body.goal,
-  //     );
-  //
-  //     switch (goalResult.type) {
-  //       case 'followUp':
-  //         await this.goalsService.save({
-  //           ...goal,
-  //           score: goalResult.score,
-  //           followUpQuestion: goalResult.followUpQuestion,
-  //         });
-  //         break;
-  //
-  //       case 'success':
-  //         await this.goalsService.save({
-  //           ...goal,
-  //           score: goalResult.score,
-  //           title: goalResult.title,
-  //           description: goalResult.description,
-  //         });
-  //         break;
-  //
-  //       default:
-  //         return notReachable(goalResult);
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //     await this.goalsService.save({
-  //       ...goal,
-  //       followUpQuestion:
-  //         'Your goal is not clear. Could you please rephrase it?',
-  //     });
-  //   }
-  //
-  //   return { goal: mapKpiToEntity(goal) };
-  // }
+  @Patch(':id')
+  async saveKpi(
+    @AuthUser() user: User,
+    @Param('id') id: string,
+    @Body() data: SaveKpiData,
+  ) {
+    const kpi = await this.kpisService.getById(id);
+    const goal = await this.goalsService.getById(kpi.goalId);
+    if (goal.userId !== user.id) {
+      throw new NotFoundException(`Goal not found`);
+    }
+
+    const validation = SaveKpiFormSchema.safeParse(data);
+    if (!validation.success) {
+      throw new BadRequestException(validation.error.errors[0].message);
+    }
+
+    const updatedKpi = await this.kpisService.save({
+      ...kpi,
+      status: data.status,
+      title: data.title,
+      description: data.description,
+      targetValue: data.targetValue,
+    });
+
+    await this.measurementService.deleteByKpiId(updatedKpi.id);
+
+    const measurement = await this.measurementService.create({
+      kpiId: updatedKpi.id,
+      goalId: updatedKpi.goalId,
+      value: data.currentValue,
+    });
+
+    return mapKpiToEntityWithMeasurements(updatedKpi, [measurement]);
+  }
 
   @Get()
   async getDraftKpis(
@@ -95,17 +85,19 @@ export class KpisController {
       throw new BadRequestException(`Goal is not formed`);
     }
 
-    const drafts = await this.kpisService.getDraftsByGoalId(goal.id);
+    const drafts = await this.kpisService.getKpisByGoalId(goal.id);
     if (drafts.length > 0) {
-      return drafts.map(mapKpiToEntity);
+      const measurements = await this.measurementService.getByGoalId(goal.id);
+      return drafts.map((kpi) => {
+        const kpiMeasurements = measurements.filter((m) => m.kpiId === kpi.id);
+        return mapKpiToEntityWithMeasurements(kpi, kpiMeasurements);
+      });
     }
 
     const suggestedKpis = await this.kpiBuildingService.buildKpis(
       uuid(),
       goal as GoalFormed,
     );
-
-    console.log(suggestedKpis);
 
     const kpis = await this.kpisService.saveDrafts(
       suggestedKpis.map((kpi) => ({
@@ -117,6 +109,6 @@ export class KpisController {
       })),
     );
 
-    return kpis.map(mapKpiToEntity);
+    return kpis.map((kpi) => mapKpiToEntityWithMeasurements(kpi, []));
   }
 }

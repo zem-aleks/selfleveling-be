@@ -17,6 +17,7 @@ import { LanggraphModule } from './modules/langgraph/langgraph.module';
 import { Goal } from './modules/goals/entities/goal.entity';
 import { KpisModule } from './modules/kpis/kpis.module';
 import { Kpi } from './modules/kpis/entities/kpi.entity';
+import { Measurement } from './modules/kpis/entities/measurement.entity';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { Kpi } from './modules/kpis/entities/kpi.entity';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [Hero, Goal, Kpi],
+          entities: [Hero, Goal, Kpi, Measurement],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],

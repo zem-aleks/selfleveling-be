@@ -10,8 +10,8 @@ export class KpisService {
     private readonly repository: Repository<Kpi>,
   ) {}
 
-  async save(goal: Kpi): Promise<Kpi> {
-    return this.repository.save(goal);
+  async save(kpi: Kpi): Promise<Kpi> {
+    return this.repository.save(kpi);
   }
 
   async saveDrafts(
@@ -20,10 +20,10 @@ export class KpisService {
     return this.repository.save(drafts);
   }
 
-  getDraftsByGoalId(goalId: string) {
+  getKpisByGoalId(goalId: string) {
     return this.repository.find({
-      where: { status: 'draft', goalId },
-      order: { createdAt: 'ASC' },
+      where: { goalId },
+      order: { status: 'ASC', createdAt: 'ASC' },
     });
   }
 

@@ -1,3 +1,5 @@
+import { MeasurementEntity } from './measurement';
+
 export type KpiEntity = {
   id: string;
   title: string;
@@ -7,4 +9,8 @@ export type KpiEntity = {
   createdAt: Date;
   updatedAt: Date;
   goalId: string;
+};
+
+export type KpiWithMeasurementsEntity = KpiEntity & {
+  measurements: MeasurementEntity[];
 };
