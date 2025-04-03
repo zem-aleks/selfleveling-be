@@ -27,6 +27,13 @@ export class KpisService {
     });
   }
 
+  getActiveKpisByGoalId(goalId: string) {
+    return this.repository.find({
+      where: { goalId, status: 'active' },
+      order: { status: 'ASC', createdAt: 'ASC' },
+    });
+  }
+
   getById(id: string) {
     return this.repository.findOne({ where: { id } });
   }

@@ -14,6 +14,7 @@ import { AuthUser } from '../../shared/decorators/auth.decorator';
 import { User } from '@supabase/supabase-js';
 import { KpisService } from './kpis.service';
 import {
+  mapKpisToEntities,
   mapKpiToEntity,
   mapKpiToEntityWithMeasurements,
 } from './mappers/mapKpiToEntity';
@@ -88,10 +89,7 @@ export class KpisController {
     const drafts = await this.kpisService.getKpisByGoalId(goal.id);
     if (drafts.length > 0) {
       const measurements = await this.measurementService.getByGoalId(goal.id);
-      return drafts.map((kpi) => {
-        const kpiMeasurements = measurements.filter((m) => m.kpiId === kpi.id);
-        return mapKpiToEntityWithMeasurements(kpi, kpiMeasurements);
-      });
+      return mapKpisToEntities(drafts, measurements);
     }
 
     const suggestedKpis = await this.kpiBuildingService.buildKpis(
@@ -109,6 +107,20 @@ export class KpisController {
       })),
     );
 
-    return kpis.map((kpi) => mapKpiToEntityWithMeasurements(kpi, []));
+    return mapKpisToEntities(kpis, []);
+  }
+
+  @Get('active')
+  async getGoalKpis(
+    @AuthUser() user: User,
+    @Query('goalId', GoalByIdPipe) goal: Goal,
+  ) {
+    if (goal.userId !== user.id) {
+      throw new NotFoundException(`Goal not found`);
+    }
+
+    const kpis = await this.kpisService.getActiveKpisByGoalId(goal.id);
+    const measurements = await this.measurementService.getByGoalId(goal.id);
+    return mapKpisToEntities(kpis, measurements);
   }
 }

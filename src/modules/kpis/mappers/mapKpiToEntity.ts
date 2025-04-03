@@ -15,3 +15,24 @@ export const mapKpiToEntityWithMeasurements = (
     measurements,
   };
 };
+
+export const mapKpisToEntities = (
+  kpis: Kpi[],
+  measurements: Measurement[],
+): KpiWithMeasurementsEntity[] => {
+  const measurementsMap = measurements.reduce<Record<string, Measurement[]>>(
+    (acc, measurement) => {
+      if (!acc[measurement.kpiId]) {
+        acc[measurement.kpiId] = [];
+      }
+      acc[measurement.kpiId].push(measurement);
+      return acc;
+    },
+    {},
+  );
+
+  return kpis.map((kpi) => ({
+    ...kpi,
+    measurements: measurementsMap[kpi.id] || [],
+  }));
+};

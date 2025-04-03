@@ -18,6 +18,9 @@ import { Goal } from './modules/goals/entities/goal.entity';
 import { KpisModule } from './modules/kpis/kpis.module';
 import { Kpi } from './modules/kpis/entities/kpi.entity';
 import { Measurement } from './modules/kpis/entities/measurement.entity';
+import { AssignedSkill } from './modules/skills/entities/assigned-skill.entity';
+import { Skill } from './modules/skills/entities/skill.entity';
+import { SkillsModule } from './modules/skills/skills.module';
 
 @Module({
   imports: [
@@ -32,7 +35,7 @@ import { Measurement } from './modules/kpis/entities/measurement.entity';
           type: 'postgres',
           schema: 'public',
           url: configService.get('DATABASE_URL'),
-          entities: [Hero, Goal, Kpi, Measurement],
+          entities: [Hero, Goal, Kpi, Measurement, Skill, AssignedSkill],
           synchronize: false,
           migrationsRun: true,
           migrations: ['dist/migration/*{.ts,.js}'],
@@ -59,6 +62,7 @@ import { Measurement } from './modules/kpis/entities/measurement.entity';
     HeroesModule,
     GoalsModule,
     KpisModule,
+    SkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
