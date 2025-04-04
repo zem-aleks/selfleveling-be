@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Measurement } from './entities/measurement.entity';
+import { Measurement } from '../entities/measurement.entity';
 
 @Injectable()
 export class MeasurementService {
@@ -36,5 +36,9 @@ export class MeasurementService {
 
   getById(id: string) {
     return this.repository.findOne({ where: { id } });
+  }
+
+  deleteMeasurementsByGoalId(goalId: string) {
+    return this.repository.delete({ goalId });
   }
 }

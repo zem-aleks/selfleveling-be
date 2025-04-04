@@ -10,6 +10,9 @@ export const mapGoalToEntity = (goal: Goal): GoalEntity => {
     case 'formed':
       return { ...goal, status: 'formed' };
 
+    case 'active':
+      return { ...goal, status: 'active' };
+
     default:
       return notReachable(goal.status);
   }

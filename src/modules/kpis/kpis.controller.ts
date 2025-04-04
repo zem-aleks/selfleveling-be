@@ -12,10 +12,9 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { AuthUser } from '../../shared/decorators/auth.decorator';
 import { User } from '@supabase/supabase-js';
-import { KpisService } from './kpis.service';
+import { KpisService } from './services/kpis.service';
 import {
   mapKpisToEntities,
-  mapKpiToEntity,
   mapKpiToEntityWithMeasurements,
 } from './mappers/mapKpiToEntity';
 import { Goal } from '../goals/entities/goal.entity';
@@ -25,7 +24,7 @@ import { uuid } from '@supabase/supabase-js/dist/main/lib/helpers';
 import { GoalFormed } from '../goals/types/entity';
 import { GoalsService } from '../goals/goals.service';
 import { SaveKpiData, SaveKpiFormSchema } from './types/data';
-import { MeasurementService } from './measurement.service';
+import { MeasurementService } from './services/measurement.service';
 
 @Controller('kpis')
 @UseGuards(JwtAuthGuard)

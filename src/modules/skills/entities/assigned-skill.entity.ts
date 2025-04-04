@@ -26,6 +26,9 @@ export class AssignedSkill {
   @Column({ nullable: false, default: 0, type: 'smallint' })
   vote: 1 | 0 | -1;
 
+  @Column({ nullable: false, default: 'draft', type: 'varchar' })
+  status: 'draft' | 'active';
+
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 

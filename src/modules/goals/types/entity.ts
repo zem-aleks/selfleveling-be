@@ -18,7 +18,11 @@ export type GoalFormed = GoalCommonFields & {
   status: 'formed';
 };
 
-export type GoalEntity = GoalDraft | GoalFormed;
+export type GoalActive = Omit<GoalFormed, 'status'> & {
+  status: 'active';
+};
+
+export type GoalEntity = GoalDraft | GoalFormed | GoalActive;
 
 // type GoalProcessing = {};
 

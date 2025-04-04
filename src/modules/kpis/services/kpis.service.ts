@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Kpi } from './entities/kpi.entity';
+import { Kpi } from '../entities/kpi.entity';
 
 @Injectable()
 export class KpisService {
@@ -36,5 +36,9 @@ export class KpisService {
 
   getById(id: string) {
     return this.repository.findOne({ where: { id } });
+  }
+
+  deleteKpisByGoalId(goalId: string) {
+    return this.repository.delete({ goalId });
   }
 }

@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export type GoalStatus = 'draft' | 'formed';
+export type GoalStatus = 'draft' | 'formed' | 'active';
 
 @Entity()
 export class Goal {

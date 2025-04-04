@@ -35,4 +35,12 @@ export class AssignedSkillsService {
 
     return this.repository.save(assignedSkills);
   }
+
+  deleteAssignedSkillsByGoalId(goalId: string) {
+    return this.repository.delete({ goalId });
+  }
+
+  activateGoalSkills(goalId: string) {
+    return this.repository.update({ goalId }, { status: 'active' });
+  }
 }

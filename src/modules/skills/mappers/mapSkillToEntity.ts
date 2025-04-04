@@ -18,6 +18,7 @@ export const mapSkillToEntity = (
     experience: assignedSkill.experience,
     goalId: assignedSkill.goalId,
     heroId: assignedSkill.heroId,
+    status: assignedSkill.status,
   };
 };
 

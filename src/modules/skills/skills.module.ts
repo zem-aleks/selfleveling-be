@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SkillsController } from './skills.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Skill } from './entities/skill.entity';
@@ -8,7 +8,10 @@ import { GoalsModule } from '../goals/goals.module';
 import { AssignedSkillsService } from './services/assigned-skills.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Skill, AssignedSkill]), GoalsModule],
+  imports: [
+    TypeOrmModule.forFeature([Skill, AssignedSkill]),
+    forwardRef(() => GoalsModule),
+  ],
   controllers: [SkillsController],
   providers: [SkillsService, AssignedSkillsService],
   exports: [SkillsService, AssignedSkillsService],

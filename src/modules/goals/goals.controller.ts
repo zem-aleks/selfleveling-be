@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -21,6 +23,9 @@ import { HeroesService } from '../heroes/heroes.service';
 import { mapHeroToEntity } from '../heroes/mappers/mapHeroToEntity';
 import { notReachable } from '../../shared/utils/notReachable';
 import { GoalExtractService } from '../langgraph/services/goal-extract.service';
+import { KpisService } from '../kpis/services/kpis.service';
+import { MeasurementService } from '../kpis/services/measurement.service';
+import { AssignedSkillsService } from '../skills/services/assigned-skills.service';
 
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
@@ -29,6 +34,9 @@ export class GoalsController {
     private readonly goalExtractService: GoalExtractService,
     private readonly goalsService: GoalsService,
     private readonly heroesService: HeroesService,
+    private readonly kpisService: KpisService,
+    private readonly measurementsService: MeasurementService,
+    private readonly assignedSkillsService: AssignedSkillsService,
   ) {}
 
   @Post()
@@ -162,5 +170,46 @@ export class GoalsController {
     }
 
     return { goal: mapGoalToEntity(goal) };
+  }
+
+  @Patch(':id')
+  async acceptGoal(
+    @AuthUser() user: User,
+    @Param('id', GoalByIdPipe) goal: Goal,
+  ) {
+    if (goal.userId !== user.id) {
+      throw new NotFoundException(`Goal not found`);
+    }
+
+    if (goal.status !== 'formed') {
+      throw new BadRequestException(`Goal is not formed`);
+    }
+
+    await this.assignedSkillsService.activateGoalSkills(goal.id);
+    await this.goalsService.save({
+      ...goal,
+      status: 'active',
+    });
+  }
+
+  @Patch(':id')
+  async deleteGoal(
+    @AuthUser() user: User,
+    @Param('id', GoalByIdPipe) goal: Goal,
+  ) {
+    if (goal.userId !== user.id) {
+      throw new NotFoundException(`Goal not found`);
+    }
+
+    if (goal.status !== 'formed') {
+      throw new BadRequestException(`Goal is not formed`);
+    }
+
+    await this.measurementsService.deleteMeasurementsByGoalId(goal.id);
+    await this.kpisService.deleteKpisByGoalId(goal.id);
+    await this.assignedSkillsService.deleteAssignedSkillsByGoalId(goal.id);
+    await this.goalsService.delete(goal.id);
+
+    return;
   }
 }

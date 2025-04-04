@@ -1,3 +1,5 @@
+export type SkillStatus = 'draft' | 'active';
+
 export type SkillEntity = {
   id: string;
   title: string;
@@ -8,6 +10,7 @@ export type SkillEntity = {
   vote: -1 | 0 | 1;
   level: number;
   experience: number;
+  status: SkillStatus;
   goalId: string;
   heroId: string;
 };
