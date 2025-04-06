@@ -1,11 +1,19 @@
 import { SkillEntity } from '../types/entity';
 import { Skill } from '../entities/skill.entity';
 import { AssignedSkill } from '../entities/assigned-skill.entity';
+import { getXpForLevel } from '../helpers/getXpForLevel';
 
 export const mapSkillToEntity = (
   skill: Skill,
   assignedSkill: AssignedSkill,
 ): SkillEntity => {
+  const currentLevelXp = getXpForLevel(assignedSkill.level - 1);
+  const expToNextLevel = getXpForLevel(assignedSkill.level);
+  const levelProgress = Math.round(
+    (assignedSkill.experience - currentLevelXp) /
+      (expToNextLevel - currentLevelXp),
+  );
+
   return {
     id: skill.id,
     title: skill.title,
@@ -19,6 +27,8 @@ export const mapSkillToEntity = (
     goalId: assignedSkill.goalId,
     heroId: assignedSkill.heroId,
     status: assignedSkill.status,
+    experienceToLevelUp: expToNextLevel,
+    levelProgress,
   };
 };
 

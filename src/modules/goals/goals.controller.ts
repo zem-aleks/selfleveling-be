@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -26,6 +27,11 @@ import { GoalExtractService } from '../langgraph/services/goal-extract.service';
 import { KpisService } from '../kpis/services/kpis.service';
 import { MeasurementService } from '../kpis/services/measurement.service';
 import { AssignedSkillsService } from '../skills/services/assigned-skills.service';
+import {
+  mapKpisToEntities,
+  mapKpiToEntityWithMeasurements,
+} from '../kpis/mappers/mapKpiToEntity';
+import { GoalEnhancedEntity } from './types/entity';
 
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
@@ -113,6 +119,45 @@ export class GoalsController {
     return { goal: mapGoalToEntity(goal), hero: mapHeroToEntity(hero) };
   }
 
+  @Get('hero/:heroId/active')
+  async getHeroGoals(
+    @AuthUser() user: User,
+    @Param('heroId', HeroByIdPipe) hero: Hero,
+  ): Promise<GoalEnhancedEntity[]> {
+    if (hero.userId !== user.id) {
+      throw new NotFoundException(`Hero not found`);
+    }
+
+    const goals = await this.goalsService.getActiveByHeroId(hero.id);
+    // TODO: refactor, to prevent requests in the loop
+    const promises = goals.map(async (goal) => {
+      const kpis = await this.kpisService.getActiveKpisByGoalId(goal.id);
+      const measurements = await this.measurementsService.getByGoalId(goal.id);
+      const goalEnhanced: GoalEnhancedEntity = {
+        ...goal,
+        status: 'active',
+        kpis: mapKpisToEntities(kpis, measurements),
+      };
+
+      return goalEnhanced;
+    });
+
+    return await Promise.all(promises);
+  }
+
+  @Get('hero/:heroId/draft')
+  async getHeroGoalDrafts(
+    @AuthUser() user: User,
+    @Param('heroId', HeroByIdPipe) hero: Hero,
+  ) {
+    if (hero.userId !== user.id) {
+      throw new NotFoundException(`Hero not found`);
+    }
+
+    const goals = await this.goalsService.getDraftsByHero(hero.id);
+    return goals.map(mapGoalToEntity);
+  }
+
   @Put(':id')
   async addGoalDetails(
     @AuthUser() user: User,
@@ -192,7 +237,7 @@ export class GoalsController {
     });
   }
 
-  @Patch(':id')
+  @Delete(':id')
   async deleteGoal(
     @AuthUser() user: User,
     @Param('id', GoalByIdPipe) goal: Goal,
@@ -201,9 +246,7 @@ export class GoalsController {
       throw new NotFoundException(`Goal not found`);
     }
 
-    if (goal.status !== 'formed') {
-      throw new BadRequestException(`Goal is not formed`);
-    }
+    // TODO: depends on status deletion should be different
 
     await this.measurementsService.deleteMeasurementsByGoalId(goal.id);
     await this.kpisService.deleteKpisByGoalId(goal.id);

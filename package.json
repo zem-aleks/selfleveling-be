@@ -39,6 +39,7 @@
     "@supabase/supabase-js": "^2.49.1",
     "axios": "^1.8.3",
     "cache-manager": "^5.7.1",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "js-tiktoken": "^1.0.12",
     "jwks-rsa": "^3.1.0",

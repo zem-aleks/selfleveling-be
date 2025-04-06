@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { GoalDraft } from './types/entity';
 import { Goal } from './entities/goal.entity';
 
@@ -31,6 +31,18 @@ export class GoalsService {
 
   getById(id: string) {
     return this.repository.findOne({ where: { id } });
+  }
+
+  getActiveByHeroId(heroId: string) {
+    return this.repository.find({
+      where: { heroId, status: 'active' },
+    });
+  }
+
+  getDraftsByHero(heroId: string) {
+    return this.repository.find({
+      where: { heroId, status: Not('active') },
+    });
   }
 
   delete(id: string) {

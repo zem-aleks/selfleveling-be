@@ -14,6 +14,8 @@ import { Goal } from '../goals/entities/goal.entity';
 import { AssignedSkillsService } from './services/assigned-skills.service';
 import { mapSkillsToEntities } from './mappers/mapSkillToEntity';
 import { SkillEntity } from './types/entity';
+import { HeroByIdPipe } from '../heroes/pipes/hero-by-id.pipe';
+import { Hero } from '../heroes/entities/hero.entity';
 
 @Controller('skills')
 @UseGuards(JwtAuthGuard)
@@ -47,5 +49,27 @@ export class SkillsController {
       await this.assignedSkillsService.assignSkillsToGoal(newSkills, goal);
 
     return mapSkillsToEntities(newSkills, assignedNewSkills);
+  }
+
+  @Get('hero')
+  async getHeroSkills(
+    @AuthUser() user: User,
+    @Query('heroId', HeroByIdPipe) hero: Hero,
+  ): Promise<SkillEntity[]> {
+    if (hero.userId !== user.id) {
+      throw new NotFoundException(`Goal not found`);
+    }
+
+    const assignedSkills =
+      await this.assignedSkillsService.getHeroAssignedSkills(hero.id);
+
+    if (assignedSkills.length > 0) {
+      const skills = await this.skillsService.getByIds(
+        assignedSkills.map((s) => s.skillId),
+      );
+      return mapSkillsToEntities(skills, assignedSkills);
+    }
+
+    return [];
   }
 }

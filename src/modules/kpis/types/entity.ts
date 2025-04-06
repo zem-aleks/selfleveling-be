@@ -13,4 +13,6 @@ export type KpiEntity = {
 
 export type KpiWithMeasurementsEntity = KpiEntity & {
   measurements: MeasurementEntity[];
+  currentValue: string;
+  startingValue: string;
 };
