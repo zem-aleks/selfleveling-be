@@ -19,7 +19,7 @@ export class KpiBuildingService {
     const streamResponse = await this.langraphService.runStream({
       threadId: thread.thread_id,
       graphId: this.graphId,
-      input: { goalTitle: goal.title, goalDescription: goal.description },
+      input: { goalTitle: goal.title, goalDescription: '' },
     });
 
     for await (const event of streamResponse) {

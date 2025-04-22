@@ -43,8 +43,12 @@ export class KpisController {
     @Body() data: SaveKpiData,
   ) {
     const kpi = await this.kpisService.getById(id);
+    if (!kpi) {
+      throw new NotFoundException(`KPI not found`);
+    }
+
     const goal = await this.goalsService.getById(kpi.goalId);
-    if (goal.userId !== user.id) {
+    if (!goal || goal.userId !== user.id) {
       throw new NotFoundException(`Goal not found`);
     }
 

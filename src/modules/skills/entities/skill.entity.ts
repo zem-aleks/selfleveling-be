@@ -17,7 +17,7 @@ export class Skill {
   @Column({ nullable: false })
   description: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   logoFilename: string | null;
 
   @Column({ nullable: false, default: 1 })

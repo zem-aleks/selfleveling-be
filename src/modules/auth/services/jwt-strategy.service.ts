@@ -35,7 +35,9 @@ export class JwtStrategyService extends PassportStrategy(Strategy) {
 
   async validate(req: Request, payload: JwtPayload) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    const response = await this.supabaseService.supabase.auth.getUser(token);
+    const response = await this.supabaseService.supabase.auth.getUser(
+      token ?? undefined,
+    );
     const user = response.data.user;
 
     if (!user) {

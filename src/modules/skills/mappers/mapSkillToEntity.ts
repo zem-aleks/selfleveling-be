@@ -18,7 +18,7 @@ export const mapSkillToEntity = (
     id: skill.id,
     title: skill.title,
     description: skill.description,
-    logoFilename: skill.logoFilename,
+    logoFilename: skill.logoFilename || '', // TODO: add default logo
     howManyTimesUsed: skill.howManyTimesUsed,
     rating: skill.rating,
     vote: assignedSkill.vote,

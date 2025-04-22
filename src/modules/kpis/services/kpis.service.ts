@@ -30,7 +30,7 @@ export class KpisService {
   getActiveKpisByGoalId(goalId: string) {
     return this.repository.find({
       where: { goalId, status: 'active' },
-      order: { status: 'ASC', createdAt: 'ASC' },
+      order: { status: 'ASC', updatedAt: 'DESC' },
     });
   }
 
