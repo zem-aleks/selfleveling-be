@@ -21,7 +21,7 @@ export class AssignedSkillsService {
 
   getHeroAssignedSkills(heroId: string) {
     return this.repository.find({
-      where: { heroId },
+      where: { heroId, status: 'active' },
       order: { createdAt: 'ASC' },
     });
   }
