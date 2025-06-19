@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Hero } from './entities/hero.entity';
 import { HeroEntity } from './types/entity';
+import { DEFAULT_HERO_ATTRIBUTES } from './constant/defaultHeroAttributes';
 
 @Injectable()
 export class HeroesService {
@@ -14,7 +15,10 @@ export class HeroesService {
   async create(
     data: Omit<HeroEntity, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<HeroEntity> {
-    return this.repository.save(data);
+    return this.repository.save({
+      ...data,
+      attributes: DEFAULT_HERO_ATTRIBUTES,
+    });
   }
 
   async save(chat: Hero): Promise<Hero> {

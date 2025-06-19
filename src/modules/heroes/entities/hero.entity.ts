@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { HeroAttribute } from '../types/entity';
 
 @Entity()
 export class Hero {
@@ -19,6 +20,9 @@ export class Hero {
 
   @Column({ nullable: false })
   language: string;
+
+  @Column({ nullable: false, type: 'simple-json' })
+  attributes: HeroAttribute[];
 
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
