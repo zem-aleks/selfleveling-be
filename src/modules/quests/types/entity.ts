@@ -6,11 +6,13 @@ export type QuestEntity = {
   description: string;
   rewards: QuestRewards;
   penalties: QuestPenalties;
-  status: 'active' | 'completed' | 'failed';
+  status: QuestStatus;
   deadline: Date;
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type QuestStatus = 'active' | 'completed' | 'failed';
 
 export type QuestRewards = {
   experience: number;
