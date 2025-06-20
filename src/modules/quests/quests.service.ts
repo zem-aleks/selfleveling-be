@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Quest } from './entities/quest.entity';
 import { QuestStatus } from './types/entity';
+import { FIRST_QUEST_DATA } from './data/first-quest-data';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class QuestsService {
@@ -27,5 +29,19 @@ export class QuestsService {
 
   delete(id: string) {
     return this.repository.delete({ id });
+  }
+
+  createHeroQuest(
+    data: Omit<Quest, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Quest> {
+    return this.repository.save(data);
+  }
+
+  createInitialQuest(data: { heroId: string; userId: string }) {
+    return this.createHeroQuest({
+      ...data,
+      ...FIRST_QUEST_DATA,
+      deadline: dayjs().add(3, 'day').toDate(),
+    });
   }
 }

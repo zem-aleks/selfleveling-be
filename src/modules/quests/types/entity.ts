@@ -1,3 +1,5 @@
+import { AttributeId } from '../../attributes/types/attribute';
+
 export type QuestEntity = {
   id: string;
   userId: string;
@@ -17,10 +19,10 @@ export type QuestStatus = 'active' | 'completed' | 'failed';
 export type QuestRewards = {
   experience: number;
   skillsExperience: Record<string, number>; // { skillId: experience }
-  attributesReward: Record<string, number>; // { attributeId: experience }
+  attributesReward: Partial<Record<AttributeId, number>>; // { attributeId: experience }
 };
 
 export type QuestPenalties = {
   skillsPenalty: Record<string, number>; // { skillId: penalty }
-  attributesPenalty: Record<string, number>; // { attributeId: penalty }
+  attributesPenalty: Partial<Record<AttributeId, number>>; // { attributeId: penalty }
 };

@@ -15,11 +15,15 @@ import { AuthUser } from '../../shared/decorators/auth.decorator';
 import { User } from '@supabase/supabase-js';
 import { HeroByIdPipe } from './pipes/hero-by-id.pipe';
 import { Hero } from './entities/hero.entity';
+import { QuestsService } from '../quests/quests.service';
 
 @Controller('heroes')
 @UseGuards(JwtAuthGuard)
 export class HeroesController {
-  constructor(private readonly heroesService: HeroesService) {}
+  constructor(
+    private readonly heroesService: HeroesService,
+    private readonly questsService: QuestsService,
+  ) {}
 
   @Get()
   async getUserHeroes(@AuthUser() user: User): Promise<HeroEntity[]> {
@@ -41,11 +45,14 @@ export class HeroesController {
 
   @Post()
   async create(
-    // @Res() res: Response,
     @AuthUser() user: User,
     @Body() data: Omit<HeroEntity, 'id' | 'createdAt' | 'updatedAt' | 'userId'>,
   ): Promise<HeroEntity> {
     const hero = await this.heroesService.create({ ...data, userId: user.id });
+    await this.questsService.createInitialQuest({
+      heroId: hero.id,
+      userId: user.id,
+    });
     return mapHeroToEntity(hero);
   }
 }
