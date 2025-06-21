@@ -21,8 +21,8 @@ export class HeroesService {
     });
   }
 
-  async save(chat: Hero): Promise<Hero> {
-    return this.repository.save(chat);
+  async save(hero: Hero): Promise<Hero> {
+    return this.repository.save(hero);
   }
 
   getById(id: string) {
@@ -38,6 +38,10 @@ export class HeroesService {
       skip,
       take,
     });
+  }
+
+  softDelete(id: string) {
+    return this.repository.softDelete({ id });
   }
 
   delete(id: string) {

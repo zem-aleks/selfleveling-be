@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -54,5 +55,17 @@ export class HeroesController {
       userId: user.id,
     });
     return mapHeroToEntity(hero);
+  }
+
+  @Delete(':id')
+  async deleteHero(
+    @AuthUser() user: User,
+    @Param('id', HeroByIdPipe) hero: Hero,
+  ) {
+    if (hero.userId !== user.id) {
+      throw new NotFoundException(`Hero not found`);
+    }
+
+    return this.heroesService.softDelete(hero.id);
   }
 }

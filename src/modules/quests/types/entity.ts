@@ -9,6 +9,7 @@ export type QuestEntity = {
   rewards: QuestRewards;
   penalties: QuestPenalties;
   status: QuestStatus;
+  required: boolean;
   deadline: Date;
   createdAt: Date;
   updatedAt: Date;

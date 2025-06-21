@@ -8,6 +8,7 @@ export type HeroEntity = {
   attributes: HeroAttribute[];
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
 };
 
 export type HeroAttribute = {
