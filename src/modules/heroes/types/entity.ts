@@ -5,6 +5,10 @@ export type HeroEntity = {
   userId: string;
   name: string;
   language: string;
+  experience: number;
+  experienceToLevelUp: number;
+  levelProgress: number;
+  level: number;
   attributes: HeroAttribute[];
   createdAt: Date;
   updatedAt: Date;

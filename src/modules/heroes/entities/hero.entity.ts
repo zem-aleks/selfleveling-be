@@ -22,6 +22,12 @@ export class Hero {
   @Column({ nullable: false })
   language: string;
 
+  @Column({ nullable: false, default: 0 })
+  experience: number;
+
+  @Column({ nullable: false, default: 1 })
+  level: number;
+
   @Column({ nullable: false, type: 'simple-json' })
   attributes: HeroAttribute[];
 
