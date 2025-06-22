@@ -16,7 +16,7 @@ export type QuestEntity = {
   updatedAt: Date;
 };
 
-export type QuestStatus = 'active' | 'completed' | 'failed';
+export type QuestStatus = 'active' | 'achieved' | 'completed' | 'failed';
 
 export type QuestRewards = {
   experience: number;

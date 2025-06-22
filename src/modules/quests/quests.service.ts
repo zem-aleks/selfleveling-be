@@ -45,4 +45,17 @@ export class QuestsService {
       deadline: dayjs().add(3, 'day').toDate(),
     });
   }
+
+  async accomplishInitialQuest(heroId: string) {
+    const initialQuest = await this.repository.findOne({
+      where: { heroId, isInitial: true, status: 'active' },
+    });
+
+    if (initialQuest) {
+      return this.repository.update(
+        { heroId, isInitial: true },
+        { status: 'achieved' },
+      );
+    }
+  }
 }

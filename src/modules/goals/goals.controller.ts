@@ -31,6 +31,7 @@ import { GoalActive, GoalEnhancedEntity } from './types/entity';
 import * as dayjs from 'dayjs';
 import { notReachable } from '../../shared/utils/notReachable';
 import { SkillsService } from '../skills/services/skills.service';
+import { QuestsService } from '../quests/quests.service';
 
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
@@ -43,6 +44,7 @@ export class GoalsController {
     private readonly measurementsService: MeasurementService,
     private readonly assignedSkillsService: AssignedSkillsService,
     private readonly skillsService: SkillsService,
+    private readonly questsService: QuestsService,
   ) {}
 
   @Post()
@@ -221,6 +223,7 @@ export class GoalsController {
 
       case 'review': {
         await this.assignedSkillsService.activateGoalSkills(goal.id);
+        await this.questsService.accomplishInitialQuest(goal.heroId);
         const activeGoal = await this.goalsService.save({
           ...goal,
           status: 'active',

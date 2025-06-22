@@ -7,6 +7,7 @@ import { GoalsService } from './goals.service';
 import { LanggraphModule } from '../langgraph/langgraph.module';
 import { KpisModule } from '../kpis/kpis.module';
 import { SkillsModule } from '../skills/skills.module';
+import { QuestsModule } from '../quests/quests.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { SkillsModule } from '../skills/skills.module';
     LanggraphModule,
     forwardRef(() => KpisModule),
     forwardRef(() => SkillsModule),
+    forwardRef(() => QuestsModule),
   ],
   controllers: [GoalsController],
   providers: [GoalsService],

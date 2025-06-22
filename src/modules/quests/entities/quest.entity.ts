@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { QuestPenalties, QuestRewards } from '../types/entity';
+import { QuestPenalties, QuestRewards, QuestStatus } from '../types/entity';
 
 @Entity()
 export class Quest {
@@ -37,7 +37,7 @@ export class Quest {
   isInitial: boolean;
 
   @Column({ nullable: false, type: 'varchar' })
-  status: 'active' | 'completed' | 'failed';
+  status: QuestStatus;
 
   @Column({ nullable: false })
   deadline: Date;
