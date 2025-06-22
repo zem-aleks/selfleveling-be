@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Quest } from './entities/quest.entity';
-import { QuestStatus } from './types/entity';
 import { FIRST_QUEST_DATA } from './data/first-quest-data';
 import * as dayjs from 'dayjs';
 
@@ -17,9 +16,9 @@ export class QuestsService {
     return this.repository.save(goal);
   }
 
-  getByHeroId(heroId: string, status?: QuestStatus) {
+  getByHeroId(heroId: string) {
     return this.repository.find({
-      where: { heroId, status },
+      where: { heroId },
     });
   }
 
