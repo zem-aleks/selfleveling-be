@@ -33,6 +33,9 @@ export class Quest {
   @Column({ nullable: false })
   required: boolean;
 
+  @Column({ nullable: false, default: false })
+  isInitial: boolean;
+
   @Column({ nullable: false, type: 'varchar' })
   status: 'active' | 'completed' | 'failed';
 

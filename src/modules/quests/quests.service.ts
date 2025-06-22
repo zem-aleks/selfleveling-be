@@ -41,6 +41,7 @@ export class QuestsService {
     return this.createHeroQuest({
       ...data,
       ...FIRST_QUEST_DATA,
+      isInitial: true,
       deadline: dayjs().add(3, 'day').toDate(),
     });
   }

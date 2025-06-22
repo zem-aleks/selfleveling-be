@@ -10,6 +10,7 @@ export type QuestEntity = {
   penalties: QuestPenalties;
   status: QuestStatus;
   required: boolean;
+  isInitial: boolean;
   deadline: Date;
   createdAt: Date;
   updatedAt: Date;

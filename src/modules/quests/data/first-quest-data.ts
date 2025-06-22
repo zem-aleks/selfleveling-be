@@ -16,5 +16,6 @@ export const FIRST_QUEST_DATA: Omit<
     skillsPenalty: {},
   },
   required: true,
+  isInitial: true,
   status: 'active',
 };
